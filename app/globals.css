@@ -1,26 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Hanken+Grotesk:wght@400;500;600&family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@400;500&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-surface:            #fcf9f3;
+  --color-surface-dim:        #dcdad4;
+  --color-surface-container:  #f0eee8;
+  --color-surface-high:       #ebe8e2;
+  --color-surface-highest:    #e5e2dc;
+  --color-on-surface:         #1c1c18;
+  --color-on-surface-variant: #59413c;
+  --color-primary:            #650f00;
+  --color-primary-container:  #8c1d04;
+  --color-outline:            #8c716b;
+  --color-outline-variant:    #e0bfb8;
+  --color-surface-tint:       #ac341a;
+
+  --font-serif: 'Libre Caslon Text', 'Noto Serif JP', Georgia, serif;
+  --font-sans:  'Hanken Grotesk', 'Noto Sans JP', sans-serif;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--color-surface);
+  --color-foreground: var(--color-on-surface);
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* Typography scale */
+.font-serif { font-family: var(--font-serif); }
+.font-sans  { font-family: var(--font-sans); }
+
+/* Label caps */
+.label-caps {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Hairline divider */
+.hairline {
+  border-bottom: 1px solid var(--color-outline-variant);
 }
