@@ -5,6 +5,9 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Monogatari 物語 — Culture as a bridge, objects as a lens.',
   description: 'A cultural translator. We connect Japanese traditions to the emotions and habits already in your life.',
+  verification: {
+    google: 'R5_Vrk2bY7YylhiVePhrlw4bibOfIJY_5QmKTx7S_p0',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
