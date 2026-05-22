@@ -9,6 +9,7 @@
     "lint": "eslint",
     "seed": "tsx --env-file=.env.local scripts/seed.ts",
     "upload-images": "npx tsx --env-file=.env.local scripts/upload-images.ts",
+    "seed-batch2": "npx tsx --env-file=.env.local scripts/seed-batch2.ts",
     "postinstall": "node -e \"['babel__template 2','mdurl 2','trusted-types 2'].forEach(d=>{try{require('fs').rmSync('./node_modules/@types/'+d,{recursive:true})}catch(e){}})\" || true"
   },
   "dependencies": {
