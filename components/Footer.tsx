@@ -8,7 +8,7 @@ export default function Footer() {
           © 2024 MONOGATARI. CREATED WITH INTENTION.
         </span>
         <div className="flex gap-8">
-          {[['About', '/about'], ['Pieces', '/pieces'], ['Map', '/map']].map(([label, href]) => (
+          {[['About', '/about'], ['Pieces', '/pieces'], ['Stories', '/stories'], ['Map', '/map']].map(([label, href]) => (
             <Link key={href} href={href} className="label-caps" style={{ color: 'var(--color-on-surface-variant)' }}>
               {label}
             </Link>

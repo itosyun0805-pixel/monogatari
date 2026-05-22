@@ -26,6 +26,20 @@ export const piecesByRegionQuery = groq`
   }
 `
 
+export const allStoriesQuery = groq`
+  *[_type == "story" && !(_id in path("drafts.**"))] | order(publishedAt desc) {
+    _id, title, titleJa, slug, publishedAt, location, region, heroImage, excerpt, tags
+  }
+`
+
+export const storyBySlugQuery = groq`
+  *[_type == "story" && !(_id in path("drafts.**")) && slug.current == $slug][0] {
+    _id, title, titleJa, slug, publishedAt, location, region,
+    heroImage, excerpt, body, tags,
+    relatedPieces[]-> { _id, title, titleJa, slug, heroImage }
+  }
+`
+
 export const featuredPiecesQuery = groq`
   *[_type == "piece" && !(_id in path("drafts.**"))] | order(publishedAt desc) [0...4] {
     _id, title, titleJa, slug, category, lifestyleTags, heroImage

@@ -1,9 +1,10 @@
 import Link from 'next/link'
 
 const links = [
-  { href: '/pieces', label: 'PIECES', labelJa: '工芸' },
-  { href: '/map',    label: 'MAP',    labelJa: '地図' },
-  { href: '/about',  label: 'ABOUT',  labelJa: 'について' },
+  { href: '/pieces',  label: 'PIECES',  labelJa: '工芸' },
+  { href: '/stories', label: 'STORIES', labelJa: '物語' },
+  { href: '/map',     label: 'MAP',     labelJa: '地図' },
+  { href: '/about',   label: 'ABOUT',   labelJa: 'について' },
 ]
 
 export default function Navbar() {
