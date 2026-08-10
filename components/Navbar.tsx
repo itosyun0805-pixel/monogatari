@@ -1,32 +1,48 @@
-import Link from 'next/link'
+'use client'
+
+import { useState } from 'react'
+import { NorenLink } from './NorenTransition'
 
 const links = [
-  { href: '/pieces',  label: 'PIECES',  labelJa: '工芸' },
-  { href: '/stories', label: 'STORIES', labelJa: '物語' },
-  { href: '/map',     label: 'MAP',     labelJa: '地図' },
-  { href: '/about',   label: 'ABOUT',   labelJa: 'について' },
+  { href: '/pieces', label: 'Objects', labelJa: 'もの' },
+  { href: '/magazine', label: 'Magazine', labelJa: '読み物' },
+  { href: '/map', label: 'Places', labelJa: '産地' },
+  { href: '/about', label: 'About', labelJa: '私たち' },
 ]
 
 export default function Navbar() {
-  return (
-    <header
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5"
-      style={{ backgroundColor: 'var(--color-surface)' }}
-    >
-      <Link href="/" className="flex items-center gap-3">
-        <span className="font-serif text-base font-normal tracking-widest uppercase" style={{ color: 'var(--color-on-surface)' }}>
-          MONOGATARI
-        </span>
-        <span className="text-sm" style={{ color: 'var(--color-on-surface-variant)' }}>物語</span>
-      </Link>
+  const [open, setOpen] = useState(false)
 
-      <nav className="flex items-center gap-8">
+  return (
+    <header className="site-header">
+      <NorenLink href="/" className="site-logo" aria-label="Monogatari home" onClick={() => setOpen(false)}>
+        <span className="noren-mark" aria-hidden="true"><i /><i /></span>
+        <span className="site-logo__type">
+          <b>mono.stories</b>
+          <small>OBJECTS · CULTURE · STORIES</small>
+        </span>
+      </NorenLink>
+
+      <button
+        type="button"
+        className="site-menu-button"
+        aria-expanded={open}
+        aria-controls="primary-navigation"
+        onClick={() => setOpen((value) => !value)}
+      >
+        {open ? 'Close' : 'Menu'}
+      </button>
+
+      <nav id="primary-navigation" className={`site-nav ${open ? 'site-nav--open' : ''}`} aria-label="Primary navigation">
         {links.map(l => (
-          <Link key={l.href} href={l.href} className="flex items-center gap-1.5 group">
-            <span className="label-caps" style={{ color: 'var(--color-on-surface)' }}>{l.label}</span>
-            <span className="text-xs" style={{ color: 'var(--color-on-surface-variant)' }}>{l.labelJa}</span>
-          </Link>
+          <NorenLink key={l.href} href={l.href} onClick={() => setOpen(false)}>
+            <span>{l.label}</span>
+            <small lang="ja">{l.labelJa}</small>
+          </NorenLink>
         ))}
+        <NorenLink href="/newsletter" className="site-nav__letter" onClick={() => setOpen(false)}>
+          The Letter
+        </NorenLink>
       </nav>
     </header>
   )

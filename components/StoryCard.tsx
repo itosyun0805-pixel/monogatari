@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { NorenLink } from './NorenTransition'
 import Image from 'next/image'
 import { urlFor } from '@/sanity/lib/image'
 
@@ -17,7 +17,7 @@ export default function StoryCard({ title, titleJa, slug, publishedAt, location,
   const date = publishedAt ? new Date(publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : null
 
   return (
-    <Link href={`/stories/${slug.current}`} className="group block">
+    <NorenLink href={`/magazine/${slug.current}`} className="group block">
       <div className="overflow-hidden mb-5" style={{ aspectRatio: '3/2', backgroundColor: 'var(--color-surface-high)' }}>
         {heroImage && (
           <Image
@@ -62,6 +62,6 @@ export default function StoryCard({ title, titleJa, slug, publishedAt, location,
           ))}
         </div>
       )}
-    </Link>
+    </NorenLink>
   )
 }

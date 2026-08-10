@@ -1,10 +1,12 @@
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import type { Metadata } from 'next'
+import { NorenLink } from '@/components/NorenTransition'
 
 export const metadata: Metadata = {
-  title: 'About — Monogatari 物語',
+  title: 'About',
   description: 'A cultural translator bridging Japanese craft and global life.',
+  alternates: { canonical: '/about' },
 }
 
 export default function AboutPage() {
@@ -38,7 +40,7 @@ export default function AboutPage() {
               WHY WE EXIST
             </span>
             <p className="font-serif text-2xl leading-relaxed" style={{ color: 'var(--color-on-surface)' }}>
-              "Japan is not hard to love. It is hard to explain."
+              &ldquo;Japan is not hard to love. It is hard to explain.&rdquo;
             </p>
           </div>
           <div className="space-y-5 font-sans" style={{ color: 'var(--color-on-surface-variant)', lineHeight: '1.75' }}>
@@ -115,11 +117,11 @@ export default function AboutPage() {
             MAKER-FIRST
           </span>
           <h2 className="font-serif mb-6" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', lineHeight: 1.2, color: 'var(--color-on-surface)' }}>
-            Every object is someone's life work.
+            Every object is someone&apos;s life work.
           </h2>
           <p className="font-sans" style={{ color: 'var(--color-on-surface-variant)', lineHeight: '1.75', maxWidth: '36rem' }}>
             We name the makers, locate their workshops, and surface their words — because
-            objects without authors are just commodities. Japan's craft traditions survived
+            objects without authors are just commodities. Japan&apos;s craft traditions survived
             precisely because individuals chose to dedicate their lives to them. That
             deserves acknowledgment.
           </p>
@@ -133,20 +135,20 @@ export default function AboutPage() {
             START EXPLORING
           </span>
           <div className="flex gap-4 flex-wrap">
-            <a
+            <NorenLink
               href="/pieces"
               className="inline-block px-8 py-4 label-caps transition-opacity hover:opacity-70"
               style={{ backgroundColor: 'var(--color-on-surface)', color: 'var(--color-surface)' }}
             >
               BROWSE PIECES →
-            </a>
-            <a
+            </NorenLink>
+            <NorenLink
               href="/map"
               className="inline-block px-8 py-4 label-caps transition-opacity hover:opacity-70"
               style={{ border: '1px solid var(--color-on-surface)', color: 'var(--color-on-surface)' }}
             >
               EXPLORE BY REGION
-            </a>
+            </NorenLink>
           </div>
         </section>
 

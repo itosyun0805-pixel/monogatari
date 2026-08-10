@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import dynamic from 'next/dynamic'
+import { NorenLink } from '@/components/NorenTransition'
 
 const JapanMap = dynamic(() => import('@/components/JapanMap'), { ssr: false })
 
@@ -93,7 +93,7 @@ export default function MapClient({ allPieces }: { allPieces: Piece[] }) {
                       PIECES FROM THIS REGION
                     </p>
                     {piecesForRegion(activeData.id).map((p: Piece) => (
-                      <Link
+                      <NorenLink
                         key={p._id}
                         href={`/pieces/${p.slug.current}`}
                         className="flex items-center justify-between py-4 group transition-opacity hover:opacity-70"
@@ -101,7 +101,7 @@ export default function MapClient({ allPieces }: { allPieces: Piece[] }) {
                       >
                         <span className="font-serif text-lg" style={{ color: 'var(--color-on-surface)' }}>{p.title}</span>
                         <span className="label-caps" style={{ color: 'var(--color-primary-container)', fontSize: '10px' }}>VIEW →</span>
-                      </Link>
+                      </NorenLink>
                     ))}
                   </div>
                 ) : (

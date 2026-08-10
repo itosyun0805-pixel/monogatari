@@ -1,75 +1,152 @@
 import Image from 'next/image'
-import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import NewsletterSignup from '@/components/NewsletterSignup'
+import StructuredData from '@/components/StructuredData'
+import { NorenLink } from '@/components/NorenTransition'
 import PieceCard from '@/components/PieceCard'
+import { editorialStories } from '@/content/editorial'
 import { client } from '@/sanity/lib/client'
-import { featuredPiecesQuery } from '@/sanity/lib/queries'
+import { allPiecesQuery } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
+import { siteDescription, siteUrl } from '@/lib/site'
+import type { PieceSummary } from '@/types/content'
 
 export const revalidate = 60
 
 export default async function Home() {
-  const pieces = await client.fetch(featuredPiecesQuery)
-  const hero = pieces[0]
+  const pieces = await client.fetch<PieceSummary[]>(allPiecesQuery)
+  const hero = pieces.find((piece) => piece.slug?.current === 'noren') || pieces[0]
+  const featured = [hero, ...pieces.filter((piece) => piece._id !== hero?._id)].filter((piece): piece is PieceSummary => Boolean(piece)).slice(0, 3)
+  const storyPieces = new Map(pieces.map((piece) => [piece.slug.current, piece]))
+  const leadStory = editorialStories[0]
+  const leadStoryPiece = storyPieces.get(leadStory.relatedPieceSlug)
 
   return (
     <>
       <Navbar />
-
-      {/* Hero */}
-      <section className="relative h-screen w-full overflow-hidden">
-        {hero?.heroImage && (
-          <Image
-            src={urlFor(hero.heroImage).width(1600).height(900).url()}
-            alt={hero.title}
-            fill
-            className="object-cover"
-            priority
-          />
-        )}
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(28,28,24,0.65) 0%, transparent 60%)' }} />
-        <div className="absolute bottom-16 left-8 right-8">
-          <h1 className="font-serif text-white mb-3" style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', lineHeight: 1.1, letterSpacing: '-0.02em' }}>
-            MONOGATARI
-          </h1>
-          <p className="text-white/80 font-sans text-lg">Culture as a bridge, objects as a lens.</p>
-          <Link href="/pieces" className="mt-8 inline-flex items-center gap-2 label-caps text-white/60 hover:text-white transition-colors">
-            EXPLORE <span>↓</span>
-          </Link>
-        </div>
-      </section>
-
-      {/* Mission statement */}
-      <section className="px-8 py-24 text-center" style={{ backgroundColor: 'var(--color-surface)' }}>
-        <div className="max-w-2xl mx-auto">
-          <div className="w-8 h-8 border-2 flex items-center justify-center mx-auto mb-8" style={{ borderColor: 'var(--color-primary-container)' }}>
-            <span className="font-serif text-sm" style={{ color: 'var(--color-primary-container)' }}>M</span>
+      <main>
+        <section className="home-hero">
+          {hero?.heroImage && (
+            <Image
+              src={urlFor(hero.heroImage).width(1800).height(1200).url()}
+              alt="An indigo noren marking the threshold between two spaces"
+              fill
+              className="home-hero__image"
+              priority
+              sizes="100vw"
+            />
+          )}
+          <div className="home-hero__veil" />
+          <div className="home-hero__copy">
+            <span className="eyebrow eyebrow--light">A MAGAZINE YOU CAN LIVE WITH</span>
+            <h1>Objects carry<br />stories across<br />cultures.</h1>
+            <p>Japanese objects, the people behind them, and the context that helps them live in your world.</p>
+            <div className="button-row">
+              <NorenLink href="/magazine" className="button button--light">Read the magazine</NorenLink>
+              <NorenLink href="/pieces" className="text-link text-link--light">Meet the objects <span>↗</span></NorenLink>
+            </div>
           </div>
-          <p className="font-sans text-lg leading-relaxed" style={{ color: 'var(--color-on-surface)', lineHeight: '1.8' }}>
-            Monogatari is a cultural translator. We don&apos;t just sell objects; we
-            connect Japanese traditions to the emotions and habits already in your life.
-          </p>
-          <div className="mt-8 w-16 mx-auto" style={{ borderBottom: '1px solid var(--color-outline-variant)' }} />
-        </div>
-      </section>
+          <div className="home-hero__threshold" aria-hidden="true">
+            <span lang="ja">くぐる</span>
+            <i />
+          </div>
+        </section>
 
-      {/* Featured pieces */}
-      <section className="px-8 pb-24" style={{ backgroundColor: 'var(--color-surface)' }}>
-        <div className="flex items-center justify-between mb-10" style={{ borderBottom: '1px solid var(--color-outline-variant)', paddingBottom: '16px' }}>
-          <span className="label-caps" style={{ color: 'var(--color-on-surface-variant)' }}>CURATED LENS</span>
-          <Link href="/pieces" className="label-caps flex items-center gap-2" style={{ color: 'var(--color-primary-container)' }}>
-            VIEW ALL ——
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {pieces.slice(0, 3).map((piece: any) => (
-            <PieceCard key={piece._id} {...piece} />
-          ))}
-        </div>
-      </section>
+        <section className="manifesto page-shell">
+          <div className="manifesto__mark"><span className="noren-mark" aria-hidden="true"><i /><i /></span></div>
+          <div>
+            <span className="eyebrow">MONOGATARI · 物語</span>
+            <p className="manifesto__lead">Japan is not hard to love. It is hard to explain.</p>
+            <p className="manifesto__body">We translate objects through use, history, and cultural context — not as relics, but as living expressions made for homes now.</p>
+          </div>
+        </section>
 
+        <section className="home-section page-shell">
+          <header className="section-heading">
+            <div><span className="eyebrow">OBJECTS · もの</span><h2>Three ways into Japan.</h2></div>
+            <NorenLink href="/pieces" className="text-link">Explore all objects <span>↗</span></NorenLink>
+          </header>
+          <div className="piece-grid">
+            {featured.map((piece) => <PieceCard key={piece._id} {...piece} />)}
+          </div>
+        </section>
+
+        <section className="editorial-feature">
+          <div className="page-shell editorial-feature__grid">
+            <div className="editorial-feature__image">
+              {leadStoryPiece?.heroImage && (
+                <Image
+                  src={urlFor(leadStoryPiece.heroImage).width(1200).height(900).url()}
+                  alt="Indigo noren hanging in a Japanese doorway"
+                  fill
+                  sizes="(max-width: 800px) 100vw, 58vw"
+                  className="object-cover"
+                />
+              )}
+            </div>
+            <div className="editorial-feature__copy">
+              <span className="eyebrow">MAGAZINE · ISSUE 01</span>
+              <p className="story-number">STORY {leadStory.number} · {leadStory.readTime}</p>
+              <h2>{leadStory.title}</h2>
+              <p className="japanese-title" lang="ja">{leadStory.titleJa}</p>
+              <p>{leadStory.excerpt}</p>
+              <NorenLink href={`/magazine/${leadStory.slug}`} className="button button--ink">Enter the story</NorenLink>
+            </div>
+          </div>
+        </section>
+
+        <section className="home-section page-shell">
+          <header className="section-heading">
+            <div><span className="eyebrow">LATEST READING · 最新の読み物</span><h2>Context before possession.</h2></div>
+            <NorenLink href="/magazine" className="text-link">Open the magazine <span>↗</span></NorenLink>
+          </header>
+          <div className="story-list">
+            {editorialStories.slice(1, 4).map((story) => (
+              <NorenLink href={`/magazine/${story.slug}`} key={story.slug} className="story-row">
+                <span className="story-row__meta">{story.category}<small>{story.format}</small></span>
+                <span><b>{story.title}</b><small lang="ja">{story.titleJa}</small></span>
+                <span>{story.readTime} ↗</span>
+              </NorenLink>
+            ))}
+          </div>
+        </section>
+
+        <section className="home-letter">
+          <div className="page-shell home-letter__inner">
+            <div>
+              <span className="eyebrow eyebrow--light">THE LETTER · ニュースレター</span>
+              <h2>One object.<br />One story.<br />Every week.</h2>
+              <p>No discount noise. Just a useful object, the people behind it, and the life around it.</p>
+            </div>
+            <NewsletterSignup source="home" />
+          </div>
+        </section>
+      </main>
       <Footer />
+      <StructuredData data={{
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'OnlineStore',
+            '@id': `${siteUrl}/#organization`,
+            name: 'Monogatari',
+            alternateName: 'mono.stories',
+            url: siteUrl,
+            description: siteDescription,
+            sameAs: ['https://www.instagram.com/mono.stories/'],
+          },
+          {
+            '@type': 'WebSite',
+            '@id': `${siteUrl}/#website`,
+            name: 'Monogatari',
+            url: siteUrl,
+            description: siteDescription,
+            publisher: { '@id': `${siteUrl}/#organization` },
+            inLanguage: 'en',
+          },
+        ],
+      }} />
     </>
   )
 }
