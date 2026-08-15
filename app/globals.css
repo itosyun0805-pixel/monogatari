@@ -243,7 +243,17 @@ img { display: block; }
 .article-aside dl { margin-top: 30px; }
 .article-aside dt { margin-top: 16px; color: var(--ink-soft); font-size: .56rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .article-aside dd { margin: 2px 0; font-family: var(--font-serif); }
-.article-body > div > p { margin: 0 0 30px; font-family: var(--font-serif); font-size: 1.2rem; line-height: 1.9; }
+.article-culture-lens { margin-bottom: 80px; padding: 30px; border-block: 1px solid var(--ink); }
+.article-culture-lens dl { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 28px 0 0; }
+.article-culture-lens dl > div + div { padding-left: 30px; border-left: 1px solid var(--line); }
+.article-culture-lens dt { margin-bottom: 10px; color: var(--red); font-size: .58rem; font-weight: 700; letter-spacing: .12em; }
+.article-culture-lens dd { margin: 0; font-family: var(--font-serif); font-size: 1.08rem; line-height: 1.55; }
+.article-section { margin-bottom: 70px; }
+.article-section > header { display: grid; grid-template-columns: 40px 1fr; gap: 20px; align-items: start; margin-bottom: 30px; padding-top: 18px; border-top: 1px solid var(--line); }
+.article-section > header > span { padding-top: 6px; color: var(--red); font-size: .62rem; font-weight: 700; letter-spacing: .1em; }
+.article-section > header h2 { margin: 0; font-family: var(--font-serif); font-size: clamp(2rem, 3.5vw, 3.25rem); font-weight: 400; line-height: 1.02; letter-spacing: -.035em; }
+.article-section > header h2 small { display: block; margin-top: 8px; color: var(--ink-soft); font-family: var(--font-sans); font-size: .72rem; font-weight: 400; letter-spacing: .03em; }
+.article-section > p { margin: 0 0 30px; font-family: var(--font-serif); font-size: 1.2rem; line-height: 1.9; }
 .article-body__opener::first-letter { float: left; margin: 7px 10px 0 0; color: var(--red); font-size: 5rem; line-height: .74; }
 .article-body blockquote { margin: 65px -12vw 65px -5vw; padding: 35px 0 35px 45px; border-left: 4px solid var(--red); font-family: var(--font-serif); font-size: clamp(2rem, 4vw, 4rem); line-height: 1.05; letter-spacing: -.035em; }
 .article-inline-letter { margin: 65px 0; padding: 40px; background: var(--ink); color: var(--paper); }
@@ -256,6 +266,12 @@ img { display: block; }
 .article-object h2 small { display: block; margin-top: 8px; color: var(--ink-soft); font-size: .9rem; }
 .article-object p { color: var(--ink-soft); }
 .article-object .button { grid-column: 2; justify-self: start; }
+.article-sources { margin-top: 90px; padding-top: 22px; border-top: 1px solid var(--ink); }
+.article-sources ol { margin: 30px 0 0; padding: 0; list-style: none; counter-reset: sources; }
+.article-sources li { counter-increment: sources; display: grid; grid-template-columns: 28px 1fr; gap: 12px; padding: 15px 0; border-bottom: 1px solid var(--line); }
+.article-sources li::before { content: counter(sources, decimal-leading-zero); color: var(--red); font-size: .58rem; font-weight: 700; }
+.article-sources a { font-family: var(--font-serif); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.article-sources li span { grid-column: 2; color: var(--ink-soft); font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; }
 .next-story { display: grid; grid-template-columns: 1fr 2fr auto; align-items: center; gap: 30px; padding: 55px max(32px, calc((100vw - min(1320px, calc(100vw - 64px))) / 2)); background: var(--red); color: var(--paper); }
 .next-story span { font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
 .next-story strong { font-family: var(--font-serif); font-size: clamp(2rem, 4vw, 4.5rem); font-weight: 400; line-height: 1; }
@@ -373,7 +389,10 @@ img { display: block; }
   .article-header__byline { flex-direction: column; gap: 8px; }
   .article-hero-image { height: 70vh; }
   .article-layout { padding-block: 70px; }
-  .article-body > div > p { font-size: 1.08rem; }
+  .article-culture-lens { margin-inline: -16px; padding: 26px 16px; }
+  .article-culture-lens dl { grid-template-columns: 1fr; }
+  .article-culture-lens dl > div + div { padding: 22px 0 0; border-top: 1px solid var(--line); border-left: 0; }
+  .article-section > p { font-size: 1.08rem; }
   .article-inline-letter { margin-inline: -16px; padding: 30px 20px; }
   .article-object > div { grid-template-columns: 1fr; }
   .article-object .button { grid-column: 1; }

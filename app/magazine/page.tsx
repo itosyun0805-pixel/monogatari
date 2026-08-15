@@ -5,10 +5,6 @@ import Footer from '@/components/Footer'
 import NewsletterSignup from '@/components/NewsletterSignup'
 import { NorenLink } from '@/components/NorenTransition'
 import { editorialCategories, editorialStories } from '@/content/editorial'
-import { client } from '@/sanity/lib/client'
-import { allPiecesQuery } from '@/sanity/lib/queries'
-import { urlFor } from '@/sanity/lib/image'
-import type { PieceSummary } from '@/types/content'
 
 export const revalidate = 60
 
@@ -18,11 +14,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/magazine' },
 }
 
-export default async function MagazinePage() {
-  const pieces = await client.fetch<PieceSummary[]>(allPiecesQuery)
-  const pieceMap = new Map(pieces.map((piece) => [piece.slug.current, piece]))
+export default function MagazinePage() {
   const feature = editorialStories[0]
-  const featurePiece = pieceMap.get(feature.relatedPieceSlug)
 
   return (
     <>
@@ -49,16 +42,14 @@ export default async function MagazinePage() {
 
         <section className="magazine-cover page-shell">
           <NorenLink href={`/magazine/${feature.slug}`} className="magazine-cover__image">
-            {featurePiece?.heroImage && (
-              <Image
-                src={urlFor(featurePiece.heroImage).width(1400).height(1050).url()}
-                alt="Indigo noren hanging at a threshold"
-                fill
-                priority
-                sizes="(max-width: 900px) 100vw, 62vw"
-                className="object-cover"
-              />
-            )}
+            <Image
+              src={feature.heroImage}
+              alt={feature.heroAlt}
+              fill
+              priority
+              sizes="(max-width: 900px) 100vw, 62vw"
+              className="object-cover"
+            />
             <span>FEATURE STORY</span>
           </NorenLink>
           <div className="magazine-cover__copy">
@@ -85,19 +76,16 @@ export default async function MagazinePage() {
               </header>
               <div className="magazine-grid">
                 {stories.map((story, index) => {
-                  const piece = pieceMap.get(story.relatedPieceSlug)
                   return (
                     <article className={`magazine-card ${index === 0 ? 'magazine-card--wide' : ''}`} key={story.slug}>
                       <NorenLink href={`/magazine/${story.slug}`} className="magazine-card__image">
-                        {piece?.heroImage && (
-                          <Image
-                            src={urlFor(piece.heroImage).width(1000).height(750).url()}
-                            alt={story.title}
-                            fill
-                            sizes="(max-width: 760px) 100vw, 50vw"
-                            className="object-cover"
-                          />
-                        )}
+                        <Image
+                          src={story.heroImage}
+                          alt={story.heroAlt}
+                          fill
+                          sizes="(max-width: 760px) 100vw, 50vw"
+                          className="object-cover"
+                        />
                       </NorenLink>
                       <div className="magazine-card__copy">
                         <p className="story-number">{story.format} · STORY {story.number}</p>

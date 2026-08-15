@@ -8,7 +8,6 @@ import PieceCard from '@/components/PieceCard'
 import { editorialStories } from '@/content/editorial'
 import { client } from '@/sanity/lib/client'
 import { allPiecesQuery } from '@/sanity/lib/queries'
-import { urlFor } from '@/sanity/lib/image'
 import { siteDescription, siteUrl } from '@/lib/site'
 import type { PieceSummary } from '@/types/content'
 
@@ -18,25 +17,21 @@ export default async function Home() {
   const pieces = await client.fetch<PieceSummary[]>(allPiecesQuery)
   const hero = pieces.find((piece) => piece.slug?.current === 'noren') || pieces[0]
   const featured = [hero, ...pieces.filter((piece) => piece._id !== hero?._id)].filter((piece): piece is PieceSummary => Boolean(piece)).slice(0, 3)
-  const storyPieces = new Map(pieces.map((piece) => [piece.slug.current, piece]))
   const leadStory = editorialStories[0]
-  const leadStoryPiece = storyPieces.get(leadStory.relatedPieceSlug)
 
   return (
     <>
       <Navbar />
       <main>
         <section className="home-hero">
-          {hero?.heroImage && (
-            <Image
-              src={urlFor(hero.heroImage).width(1800).height(1200).url()}
-              alt="An indigo noren marking the threshold between two spaces"
-              fill
-              className="home-hero__image"
-              priority
-              sizes="100vw"
-            />
-          )}
+          <Image
+            src={leadStory.heroImage}
+            alt={leadStory.heroAlt}
+            fill
+            className="home-hero__image"
+            priority
+            sizes="100vw"
+          />
           <div className="home-hero__veil" />
           <div className="home-hero__copy">
             <span className="eyebrow eyebrow--light">A MAGAZINE YOU CAN LIVE WITH</span>
@@ -75,15 +70,13 @@ export default async function Home() {
         <section className="editorial-feature">
           <div className="page-shell editorial-feature__grid">
             <div className="editorial-feature__image">
-              {leadStoryPiece?.heroImage && (
-                <Image
-                  src={urlFor(leadStoryPiece.heroImage).width(1200).height(900).url()}
-                  alt="Indigo noren hanging in a Japanese doorway"
-                  fill
-                  sizes="(max-width: 800px) 100vw, 58vw"
-                  className="object-cover"
-                />
-              )}
+              <Image
+                src={leadStory.heroImage}
+                alt={leadStory.heroAlt}
+                fill
+                sizes="(max-width: 800px) 100vw, 58vw"
+                className="object-cover"
+              />
             </div>
             <div className="editorial-feature__copy">
               <span className="eyebrow">MAGAZINE · ISSUE 01</span>
@@ -102,7 +95,7 @@ export default async function Home() {
             <NorenLink href="/magazine" className="text-link">Open the magazine <span>↗</span></NorenLink>
           </header>
           <div className="story-list">
-            {editorialStories.slice(1, 4).map((story) => (
+            {editorialStories.slice(1, 5).map((story) => (
               <NorenLink href={`/magazine/${story.slug}`} key={story.slug} className="story-row">
                 <span className="story-row__meta">{story.category}<small>{story.format}</small></span>
                 <span><b>{story.title}</b><small lang="ja">{story.titleJa}</small></span>
@@ -128,7 +121,7 @@ export default async function Home() {
         '@context': 'https://schema.org',
         '@graph': [
           {
-            '@type': 'OnlineStore',
+            '@type': 'Organization',
             '@id': `${siteUrl}/#organization`,
             name: 'Monogatari',
             alternateName: 'mono.stories',

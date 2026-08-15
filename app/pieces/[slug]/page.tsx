@@ -11,6 +11,7 @@ import { client } from '@/sanity/lib/client'
 import { allPiecesQuery, pieceBySlugQuery } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 import { siteUrl } from '@/lib/site'
+import { getEditorialStoryForPiece } from '@/content/editorial'
 import type { PieceDetail, PieceSummary } from '@/types/content'
 
 export const revalidate = 60
@@ -26,8 +27,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const piece = await client.fetch<PieceDetail | null>(pieceBySlugQuery, { slug })
   if (!piece) return {}
+  const editorialStory = getEditorialStoryForPiece(piece.slug.current)
   const description = piece.crossover || `Discover the origin, craft, maker, and contemporary life of ${piece.title}, a Japanese ${piece.category || 'object'}.`
-  const image = piece.heroImage ? urlFor(piece.heroImage).width(1200).height(630).url() : undefined
+  const image = editorialStory ? `${siteUrl}${editorialStory.heroImage}` : piece.heroImage ? urlFor(piece.heroImage).width(1200).height(630).url() : undefined
 
   return {
     title: piece.title,
@@ -48,6 +50,8 @@ export default async function PieceDetailPage({ params }: Props) {
   const { slug } = await params
   const piece = await client.fetch<PieceDetail | null>(pieceBySlugQuery, { slug })
   if (!piece) notFound()
+  const editorialStory = getEditorialStoryForPiece(piece.slug.current)
+  const heroImage = editorialStory?.heroImage || (piece.heroImage ? urlFor(piece.heroImage).width(1600).height(900).url() : undefined)
 
   return (
     <>
@@ -55,10 +59,10 @@ export default async function PieceDetailPage({ params }: Props) {
 
       {/* Hero */}
       <section className="relative h-screen w-full overflow-hidden">
-        {piece.heroImage ? (
+        {heroImage ? (
           <Image
-            src={urlFor(piece.heroImage).width(1600).height(900).url()}
-            alt={piece.title}
+            src={heroImage}
+            alt={editorialStory?.heroAlt || piece.title}
             fill
             className="object-cover"
             priority
@@ -73,6 +77,7 @@ export default async function PieceDetailPage({ params }: Props) {
           </h1>
           <span className="font-serif text-white/60 text-xl">/ {piece.titleJa}</span>
         </div>
+        {editorialStory && <span className="absolute bottom-5 right-5 px-3 py-2 bg-white/90 text-[10px] tracking-[0.12em] text-black">EDITORIAL IMAGE · SOURCING IN PROGRESS</span>}
       </section>
 
       {/* Content */}
@@ -85,7 +90,7 @@ export default async function PieceDetailPage({ params }: Props) {
         {piece.craft && <SectionBlock label="CRAFT" body={piece.craft} />}
 
         {/* The Maker */}
-        {piece.maker?.name && (
+        {piece.getLink && piece.maker?.name && (
           <div className="py-20 hairline text-center">
             {piece.maker.photo && (
               <div className="w-20 h-20 overflow-hidden mx-auto mb-4" style={{ borderRadius: '50%' }}>
@@ -141,20 +146,6 @@ export default async function PieceDetailPage({ params }: Props) {
         {piece.howItLives && <SectionBlock label="HOW IT LIVES" body={piece.howItLives} />}
 
         {/* The Keepers */}
-        {(piece.keepers?.length ?? 0) > 0 && (
-          <div className="py-20 hairline">
-            <span className="label-caps block mb-8" style={{ color: 'var(--color-on-surface-variant)' }}>THE KEEPERS</span>
-            <div className="space-y-8">
-              {piece.keepers?.map((k, keeperIndex) => (
-                <div key={k._key || k.name || keeperIndex} className="max-w-xl">
-                  <p className="font-serif italic text-lg mb-2" style={{ color: 'var(--color-on-surface)' }}>&ldquo;{k.quote}&rdquo;</p>
-                  <p className="label-caps" style={{ color: 'var(--color-on-surface-variant)' }}>— {k.name}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Place */}
         {piece.placeName && (
           <div className="py-12 hairline flex items-center gap-3">
@@ -167,18 +158,16 @@ export default async function PieceDetailPage({ params }: Props) {
 
         {/* Get */}
         <div className="py-16 text-center" style={{ borderTop: '2px solid var(--color-primary-container)' }}>
-          {piece.getLink ? (
-            <a
-              href={piece.getLink}
-              target="_blank"
-              rel="noopener noreferrer"
+          {editorialStory ? (
+            <NorenLink
+              href={`/magazine/${editorialStory.slug}`}
               className="inline-block px-12 py-4 label-caps text-white transition-opacity hover:opacity-80"
               style={{ backgroundColor: 'var(--color-primary-container)' }}
             >
-              ACQUIRE {piece.title.toUpperCase()}
-            </a>
+              READ THE CULTURE & FUNCTION STORY
+            </NorenLink>
           ) : (
-            <span className="label-caps" style={{ color: 'var(--color-on-surface-variant)' }}>COMING SOON</span>
+            <span className="label-caps" style={{ color: 'var(--color-on-surface-variant)' }}>EDITORIAL RESEARCH IN PROGRESS</span>
           )}
         </div>
       </main>
@@ -186,14 +175,14 @@ export default async function PieceDetailPage({ params }: Props) {
       <Footer />
       <StructuredData data={{
         '@context': 'https://schema.org',
-        '@type': 'Product',
+        '@type': 'CreativeWork',
         name: piece.title,
         alternateName: piece.titleJa,
         description: piece.crossover || `A Japanese ${piece.category || 'object'} presented with its origin, making, and everyday use.`,
-        image: piece.heroImage ? [urlFor(piece.heroImage).width(1200).height(1200).url()] : undefined,
+        image: heroImage ? [heroImage.startsWith('/') ? `${siteUrl}${heroImage}` : heroImage] : undefined,
         url: `${siteUrl}/pieces/${piece.slug.current}`,
         category: piece.category,
-        brand: { '@type': 'Brand', name: 'Monogatari' },
+        publisher: { '@type': 'Organization', name: 'Monogatari', url: siteUrl },
       }} />
       <StructuredData data={{
         '@context': 'https://schema.org',

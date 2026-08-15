@@ -21,7 +21,7 @@ async function uploadFromUrl(url: string, label: string) {
     const asset = await client.assets.upload('image', buffer, { filename: `${label}.jpg`, contentType: 'image/jpeg' })
     console.log(`  ✓ ${label}`)
     return { _type: 'image', asset: { _type: 'reference', _ref: asset._id } }
-  } catch (e) {
+  } catch {
     console.log(`  ✗ ${label} — skipped (add via Studio)`)
     return null
   }
@@ -198,7 +198,7 @@ async function run() {
 
     const heroImage = await uploadFromUrl(p.heroUrl, `${p.slug}-hero`)
 
-    const doc: any = {
+    const doc = {
       _type: 'piece',
       _id: `piece-${p.slug}`,
       title: p.title,
@@ -220,9 +220,8 @@ async function run() {
       howItLives: p.howItLives,
       keepers: p.keepers.map((k, i) => ({ _key: `k${i + 1}`, name: k.name, quote: k.quote })),
       publishedAt: new Date().toISOString(),
+      ...(heroImage ? { heroImage } : {}),
     }
-
-    if (heroImage) doc.heroImage = heroImage
 
     await client.createOrReplace(doc)
     console.log(`  ✓ ${p.title} seeded`)

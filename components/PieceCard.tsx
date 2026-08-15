@@ -2,15 +2,18 @@ import Image from 'next/image'
 import { urlFor } from '@/sanity/lib/image'
 import { NorenLink } from './NorenTransition'
 import type { PieceSummary } from '@/types/content'
+import { getEditorialStoryForPiece } from '@/content/editorial'
 
 export default function PieceCard({ title, titleJa, slug, heroImage, lifestyleTags, category }: PieceSummary) {
+  const editorialImage = getEditorialStoryForPiece(slug.current)
+
   return (
     <NorenLink href={`/pieces/${slug.current}`} className="piece-card">
       <div className="piece-card__image">
-        {heroImage && (
+        {(editorialImage || heroImage) && (
           <Image
-            src={urlFor(heroImage).width(600).height(750).url()}
-            alt={title}
+            src={editorialImage?.heroImage || urlFor(heroImage!).width(600).height(750).url()}
+            alt={editorialImage?.heroAlt || title}
             width={600}
             height={750}
             className="w-full h-full object-cover"

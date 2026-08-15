@@ -9,7 +9,6 @@ import { NorenLink } from '@/components/NorenTransition'
 import { editorialStories, getEditorialStory } from '@/content/editorial'
 import { client } from '@/sanity/lib/client'
 import { pieceBySlugQuery } from '@/sanity/lib/queries'
-import { urlFor } from '@/sanity/lib/image'
 import { siteUrl } from '@/lib/site'
 
 export const revalidate = 60
@@ -24,8 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const story = getEditorialStory(slug)
   if (!story) return {}
-  const piece = await client.fetch(pieceBySlugQuery, { slug: story.relatedPieceSlug })
-  const image = piece?.heroImage ? urlFor(piece.heroImage).width(1200).height(630).url() : undefined
+  const image = `${siteUrl}${story.heroImage}`
 
   return {
     title: story.title,
@@ -38,9 +36,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: `/magazine/${story.slug}`,
       publishedTime: story.publishedAt,
       authors: ['Shun Ito'],
-      images: image ? [{ url: image, width: 1200, height: 630, alt: story.title }] : undefined,
+      images: [{ url: image, width: 1536, height: 1024, alt: story.heroAlt }],
     },
-    twitter: { card: 'summary_large_image', title: story.title, description: story.excerpt, images: image ? [image] : undefined },
+    twitter: { card: 'summary_large_image', title: story.title, description: story.excerpt, images: [image] },
   }
 }
 
@@ -51,7 +49,7 @@ export default async function MagazineStoryPage({ params }: Props) {
   const piece = await client.fetch(pieceBySlugQuery, { slug: story.relatedPieceSlug })
   const index = editorialStories.indexOf(story)
   const next = editorialStories[(index + 1) % editorialStories.length]
-  const image = piece?.heroImage ? urlFor(piece.heroImage).width(1600).height(1000).url() : undefined
+  const image = story.heroImage
   const published = new Date(story.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
 
   return (
@@ -72,12 +70,10 @@ export default async function MagazineStoryPage({ params }: Props) {
             </div>
           </header>
 
-          {image && (
-            <figure className="article-hero-image">
-              <Image src={image} alt={story.title} fill priority sizes="100vw" className="object-cover" />
-              <figcaption>{story.relatedPieceSlug.toUpperCase()} · MONOGATARI FIELD NOTES</figcaption>
-            </figure>
-          )}
+          <figure className="article-hero-image">
+            <Image src={image} alt={story.heroAlt} fill priority sizes="100vw" className="object-cover" />
+            <figcaption>EDITORIAL IMAGE · NOT A PRODUCT PHOTOGRAPH</figcaption>
+          </figure>
 
           <div className="article-layout page-shell">
             <aside className="article-aside">
@@ -85,11 +81,25 @@ export default async function MagazineStoryPage({ params }: Props) {
               <dl><dt>Format</dt><dd>{story.format}</dd><dt>Object</dt><dd>{piece?.title || story.relatedPieceSlug}</dd><dt>Place</dt><dd>{story.location}</dd></dl>
             </aside>
             <div className="article-body">
-              {story.paragraphs.map((paragraph, paragraphIndex) => (
-                <div key={paragraph}>
-                  <p className={paragraphIndex === 0 ? 'article-body__opener' : ''}>{paragraph}</p>
-                  {paragraphIndex === 1 && <blockquote>{story.quote}</blockquote>}
-                  {paragraphIndex === 2 && (
+              <section className="article-culture-lens" aria-label="Cultural comparison">
+                <span className="eyebrow">CULTURE LENS · 文化比較</span>
+                <dl>
+                  <div><dt>FAMILIAR MODEL</dt><dd>{story.cultureLens.familiarModel}</dd></div>
+                  <div><dt>JAPANESE ALTERNATIVE</dt><dd>{story.cultureLens.japaneseAlternative}</dd></div>
+                </dl>
+              </section>
+
+              {story.sections.map((section, sectionIndex) => (
+                <section className="article-section" key={section.heading}>
+                  <header>
+                    <span>0{sectionIndex + 1}</span>
+                    <h2>{section.heading}<small lang="ja">{section.headingJa}</small></h2>
+                  </header>
+                  {section.paragraphs.map((paragraph, paragraphIndex) => (
+                    <p className={sectionIndex === 0 && paragraphIndex === 0 ? 'article-body__opener' : ''} key={paragraph}>{paragraph}</p>
+                  ))}
+                  {sectionIndex === 1 && <blockquote>{story.quote}</blockquote>}
+                  {sectionIndex === 2 && (
                     <section className="article-inline-letter">
                       <span className="eyebrow">THE LETTER</span>
                       <h2>Keep reading by email.</h2>
@@ -97,8 +107,17 @@ export default async function MagazineStoryPage({ params }: Props) {
                       <NewsletterSignup source={`article:${story.slug}`} compact />
                     </section>
                   )}
-                </div>
+                </section>
               ))}
+
+              <section className="article-sources">
+                <span className="eyebrow">SOURCES & FURTHER READING · 参考資料</span>
+                <ol>
+                  {story.sources.map((source) => (
+                    <li key={source.url}><a href={source.url} target="_blank" rel="noopener noreferrer">{source.label}</a><span>{source.publisher}</span></li>
+                  ))}
+                </ol>
+              </section>
 
               {piece && (
                 <section className="article-object">
@@ -126,7 +145,7 @@ export default async function MagazineStoryPage({ params }: Props) {
         '@type': 'Article',
         headline: story.title,
         description: story.excerpt,
-        image: image ? [image] : undefined,
+        image: [`${siteUrl}${image}`],
         datePublished: story.publishedAt,
         dateModified: story.publishedAt,
         mainEntityOfPage: `${siteUrl}/magazine/${story.slug}`,
