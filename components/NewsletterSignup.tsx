@@ -1,14 +1,16 @@
 'use client'
 
 import { useId, useState, type FormEvent } from 'react'
+import { track } from '@vercel/analytics/react'
 import { NorenLink } from './NorenTransition'
 
 type Props = {
   source: string
   compact?: boolean
+  buttonLabel?: string
 }
 
-export default function NewsletterSignup({ source, compact = false }: Props) {
+export default function NewsletterSignup({ source, compact = false, buttonLabel = 'Receive the next story' }: Props) {
   const id = useId()
   const enabled = process.env.NEXT_PUBLIC_NEWSLETTER_ENABLED === 'true'
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -48,6 +50,7 @@ export default function NewsletterSignup({ source, compact = false }: Props) {
       formElement.reset()
       setStatus('success')
       setMessage(result.message)
+      track('newsletter_signup', { source })
     } catch (error) {
       setStatus('error')
       setMessage(error instanceof Error ? error.message : 'Please try again.')
@@ -80,7 +83,7 @@ export default function NewsletterSignup({ source, compact = false }: Props) {
         <input id={`${id}-company`} name="company" tabIndex={-1} autoComplete="off" />
       </div>
       <button type="submit" disabled={status === 'loading'}>
-        {status === 'loading' ? 'Joining…' : 'Receive the next story'}
+        {status === 'loading' ? 'Joining…' : buttonLabel}
       </button>
       {status === 'error' && <p className="newsletter-error" role="alert">{message}</p>}
       <p className="newsletter-consent">

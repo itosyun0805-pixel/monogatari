@@ -23,8 +23,16 @@ export type PieceDetail = PieceSummary & {
     location?: string
     quote?: string
   }
+  makerVerified?: boolean
   newUse?: Array<{ _key?: string; image?: object; caption?: string }>
   howItLives?: PortableTextBlock[]
   keepers?: Array<{ _key?: string; name?: string; quote?: string }>
+  saleStatus?: 'editorial' | 'waitlist' | 'available' | 'soldOut'
+  price?: number
+  currency?: 'USD' | 'JPY' | 'GBP' | 'EUR'
+  checkoutUrl?: string
+  availabilityNote?: string
+  shippingNote?: string
+  salesReady?: boolean
   getLink?: string
 }

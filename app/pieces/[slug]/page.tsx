@@ -6,6 +6,7 @@ import Footer from '@/components/Footer'
 import SectionBlock from '@/components/SectionBlock'
 import CrossoverBlock from '@/components/CrossoverBlock'
 import StructuredData from '@/components/StructuredData'
+import PurchasePanel from '@/components/PurchasePanel'
 import { NorenLink } from '@/components/NorenTransition'
 import { client } from '@/sanity/lib/client'
 import { allPiecesQuery, pieceBySlugQuery } from '@/sanity/lib/queries'
@@ -52,6 +53,38 @@ export default async function PieceDetailPage({ params }: Props) {
   if (!piece) notFound()
   const editorialStory = getEditorialStoryForPiece(piece.slug.current)
   const heroImage = editorialStory?.heroImage || (piece.heroImage ? urlFor(piece.heroImage).width(1600).height(900).url() : undefined)
+  const isSellable = piece.saleStatus === 'available'
+    && piece.salesReady
+    && Boolean(piece.checkoutUrl)
+    && typeof piece.price === 'number'
+  const objectStructuredData = isSellable ? {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: piece.title,
+    alternateName: piece.titleJa,
+    description: piece.crossover || `A Japanese ${piece.category || 'object'} presented with its origin, making, and everyday use.`,
+    image: heroImage ? [heroImage.startsWith('/') ? `${siteUrl}${heroImage}` : heroImage] : undefined,
+    url: `${siteUrl}/pieces/${piece.slug.current}`,
+    category: piece.category,
+    brand: { '@type': 'Brand', name: 'Monogatari' },
+    offers: {
+      '@type': 'Offer',
+      price: piece.price,
+      priceCurrency: piece.currency || 'USD',
+      availability: 'https://schema.org/InStock',
+      url: piece.checkoutUrl,
+    },
+  } : {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: piece.title,
+    alternateName: piece.titleJa,
+    description: piece.crossover || `A Japanese ${piece.category || 'object'} presented with its origin, making, and everyday use.`,
+    image: heroImage ? [heroImage.startsWith('/') ? `${siteUrl}${heroImage}` : heroImage] : undefined,
+    url: `${siteUrl}/pieces/${piece.slug.current}`,
+    category: piece.category,
+    publisher: { '@type': 'Organization', name: 'Monogatari', url: siteUrl },
+  }
 
   return (
     <>
@@ -90,7 +123,7 @@ export default async function PieceDetailPage({ params }: Props) {
         {piece.craft && <SectionBlock label="CRAFT" body={piece.craft} />}
 
         {/* The Maker */}
-        {piece.getLink && piece.maker?.name && (
+        {piece.makerVerified && piece.maker?.name && (
           <div className="py-20 hairline text-center">
             {piece.maker.photo && (
               <div className="w-20 h-20 overflow-hidden mx-auto mb-4" style={{ borderRadius: '50%' }}>
@@ -156,34 +189,22 @@ export default async function PieceDetailPage({ params }: Props) {
           </div>
         )}
 
-        {/* Get */}
-        <div className="py-16 text-center" style={{ borderTop: '2px solid var(--color-primary-container)' }}>
-          {editorialStory ? (
-            <NorenLink
-              href={`/magazine/${editorialStory.slug}`}
-              className="inline-block px-12 py-4 label-caps text-white transition-opacity hover:opacity-80"
-              style={{ backgroundColor: 'var(--color-primary-container)' }}
-            >
-              READ THE CULTURE & FUNCTION STORY
-            </NorenLink>
-          ) : (
-            <span className="label-caps" style={{ color: 'var(--color-on-surface-variant)' }}>EDITORIAL RESEARCH IN PROGRESS</span>
-          )}
-        </div>
+        <PurchasePanel
+          title={piece.title}
+          slug={piece.slug.current}
+          status={piece.saleStatus}
+          price={piece.price}
+          currency={piece.currency}
+          checkoutUrl={piece.checkoutUrl}
+          availabilityNote={piece.availabilityNote}
+          shippingNote={piece.shippingNote}
+          salesReady={piece.salesReady}
+          editorialHref={editorialStory ? `/magazine/${editorialStory.slug}` : undefined}
+        />
       </main>
 
       <Footer />
-      <StructuredData data={{
-        '@context': 'https://schema.org',
-        '@type': 'CreativeWork',
-        name: piece.title,
-        alternateName: piece.titleJa,
-        description: piece.crossover || `A Japanese ${piece.category || 'object'} presented with its origin, making, and everyday use.`,
-        image: heroImage ? [heroImage.startsWith('/') ? `${siteUrl}${heroImage}` : heroImage] : undefined,
-        url: `${siteUrl}/pieces/${piece.slug.current}`,
-        category: piece.category,
-        publisher: { '@type': 'Organization', name: 'Monogatari', url: siteUrl },
-      }} />
+      <StructuredData data={objectStructuredData} />
       <StructuredData data={{
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',

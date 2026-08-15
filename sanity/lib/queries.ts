@@ -11,11 +11,12 @@ export const pieceBySlugQuery = groq`
   *[_type == "piece" && !(_id in path("drafts.**")) && slug.current == $slug][0] {
     _id, title, titleJa, slug, category, lifestyleTags, region, placeName,
     heroImage, origin, craft,
-    maker { name, photo, location, quote },
+    maker { name, photo, location, quote }, makerVerified,
     crossover,
     newUse[] { image, caption },
     howItLives,
     keepers[] { name, quote },
+    saleStatus, price, currency, checkoutUrl, availabilityNote, shippingNote, salesReady,
     getLink, publishedAt
   }
 `
