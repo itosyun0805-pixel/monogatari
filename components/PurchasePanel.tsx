@@ -44,7 +44,7 @@ export default function PurchasePanel({
 
   if (effectiveStatus === 'available' && checkoutUrl && typeof price === 'number') {
     return (
-      <section className="purchase-panel purchase-panel--available" aria-labelledby="purchase-heading">
+      <section id="purchase" className="purchase-panel purchase-panel--available" aria-labelledby="purchase-heading">
         <span className="eyebrow eyebrow--light">AVAILABLE · 販売中</span>
         <h2 id="purchase-heading">Bring {title} into your life.</h2>
         <p className="purchase-panel__price">{formatPrice(price, currency)}</p>
@@ -64,7 +64,7 @@ export default function PurchasePanel({
 
   if (effectiveStatus === 'soldOut') {
     return (
-      <section className="purchase-panel" aria-labelledby="purchase-heading">
+      <section id="purchase" className="purchase-panel" aria-labelledby="purchase-heading">
         <span className="eyebrow">SOLD OUT · 完売</span>
         <h2 id="purchase-heading">This edition has found its homes.</h2>
         <p>Join the letter to hear when a new edition or related object becomes available.</p>
@@ -77,7 +77,7 @@ export default function PurchasePanel({
 
   if (effectiveStatus === 'waitlist') {
     return (
-      <section className="purchase-panel" aria-labelledby="purchase-heading">
+      <section id="purchase" className="purchase-panel" aria-labelledby="purchase-heading">
         <span className="eyebrow">COMING WITH CARE · 入荷準備中</span>
         <h2 id="purchase-heading">We are sourcing the real object, not just the look.</h2>
         <p>We will open sales only after the maker, provenance, photography, delivery, and care conditions are confirmed.</p>
@@ -89,16 +89,19 @@ export default function PurchasePanel({
   }
 
   return (
-    <section className="purchase-panel" aria-labelledby="purchase-heading">
-      <span className="eyebrow">EDITORIAL OBJECT · 調査中</span>
-      <h2 id="purchase-heading">First, understand why it exists.</h2>
-      <p>This page is a cultural and functional index. No product is being offered until its maker, source, and sales conditions are verified.</p>
+    <section id="purchase" className="purchase-panel" aria-labelledby="purchase-heading">
+      <span className="eyebrow">COMING SOON · 販売準備中</span>
+      <h2 id="purchase-heading">This is where the object will become available.</h2>
+      <p>We are confirming the real object, maker, provenance, photography, delivery, and care conditions before opening sales.</p>
+      <span className="purchase-panel__button purchase-panel__button--disabled" aria-disabled="true">
+        ACQUIRE · COMING SOON
+      </span>
       {editorialHref ? (
-        <NorenLink className="button button--ink" href={editorialHref}>
+        <NorenLink className="purchase-panel__story" href={editorialHref}>
           Read the culture &amp; function story
         </NorenLink>
       ) : (
-        <NorenLink className="button button--ink" href="/newsletter">
+        <NorenLink className="purchase-panel__story" href="/newsletter">
           Receive the next story
         </NorenLink>
       )}

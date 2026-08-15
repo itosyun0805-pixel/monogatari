@@ -3,7 +3,9 @@ import { groq } from 'next-sanity'
 export const allPiecesQuery = groq`
   *[_type == "piece" && !(_id in path("drafts.**"))] | order(publishedAt desc) {
     _id, title, titleJa, slug, category, lifestyleTags, region, placeName,
-    heroImage, crossover, publishedAt
+    heroImage, crossover, saleStatus,
+    "isAvailable": saleStatus == "available" && salesReady == true && defined(checkoutUrl) && defined(price),
+    publishedAt
   }
 `
 
@@ -43,6 +45,7 @@ export const storyBySlugQuery = groq`
 
 export const featuredPiecesQuery = groq`
   *[_type == "piece" && !(_id in path("drafts.**"))] | order(publishedAt desc) [0...4] {
-    _id, title, titleJa, slug, category, lifestyleTags, heroImage
+    _id, title, titleJa, slug, category, lifestyleTags, heroImage, saleStatus,
+    "isAvailable": saleStatus == "available" && salesReady == true && defined(checkoutUrl) && defined(price)
   }
 `

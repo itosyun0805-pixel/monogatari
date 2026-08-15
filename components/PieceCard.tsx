@@ -4,8 +4,15 @@ import { NorenLink } from './NorenTransition'
 import type { PieceSummary } from '@/types/content'
 import { getEditorialStoryForPiece } from '@/content/editorial'
 
-export default function PieceCard({ title, titleJa, slug, heroImage, lifestyleTags, category }: PieceSummary) {
+export default function PieceCard({ title, titleJa, slug, heroImage, lifestyleTags, category, saleStatus, isAvailable }: PieceSummary) {
   const editorialImage = getEditorialStoryForPiece(slug.current)
+  const statusLabel = isAvailable
+    ? 'AVAILABLE · 販売中'
+    : saleStatus === 'soldOut'
+      ? 'SOLD OUT · 完売'
+      : saleStatus === 'waitlist'
+        ? 'WAITLIST · 入荷準備中'
+        : 'COMING SOON · 販売準備中'
 
   return (
     <NorenLink href={`/pieces/${slug.current}`} className="piece-card">
@@ -19,6 +26,9 @@ export default function PieceCard({ title, titleJa, slug, heroImage, lifestyleTa
             className="w-full h-full object-cover"
           />
         )}
+        <span className={`piece-card__status ${isAvailable ? 'piece-card__status--available' : ''}`}>
+          {statusLabel}
+        </span>
       </div>
       <div className="piece-card__copy">
         <div className="piece-card__meta">

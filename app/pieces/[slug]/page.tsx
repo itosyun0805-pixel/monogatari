@@ -104,13 +104,17 @@ export default async function PieceDetailPage({ params }: Props) {
           <div className="absolute inset-0" style={{ backgroundColor: 'var(--color-surface-dim)' }} />
         )}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(28,28,24,0.7) 0%, transparent 50%)' }} />
-        <div className="absolute bottom-16 left-8">
+        <div className="piece-hero__title absolute left-8">
           <h1 className="font-serif text-white" style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)', lineHeight: 1.1, letterSpacing: '-0.02em' }}>
             {piece.title}
           </h1>
           <span className="font-serif text-white/60 text-xl">/ {piece.titleJa}</span>
         </div>
-        {editorialStory && <span className="absolute bottom-5 right-5 px-3 py-2 bg-white/90 text-[10px] tracking-[0.12em] text-black">EDITORIAL IMAGE · SOURCING IN PROGRESS</span>}
+        <a className={`piece-hero__commerce ${isSellable ? 'piece-hero__commerce--available' : ''}`} href="#purchase">
+          {isSellable ? 'ACQUIRE · 販売中' : piece.saleStatus === 'soldOut' ? 'SOLD OUT · 完売' : 'COMING SOON · 販売準備中'}
+          <span aria-hidden="true">↓</span>
+        </a>
+        {editorialStory && <span className="piece-hero__image-note">EDITORIAL IMAGE · SOURCING IN PROGRESS</span>}
       </section>
 
       {/* Content */}

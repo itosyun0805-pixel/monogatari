@@ -164,6 +164,19 @@ img { display: block; }
 .piece-card__image { position: relative; overflow: hidden; aspect-ratio: 4 / 5; background: var(--paper-dim); }
 .piece-card__image img { transition: transform .65s cubic-bezier(.2,.7,.2,1); }
 .piece-card:hover .piece-card__image img { transform: scale(1.025); }
+.piece-card__status {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 9px 12px;
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  color: var(--ink);
+  font-size: .54rem;
+  font-weight: 750;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.piece-card__status--available { background: var(--red); color: var(--paper); }
 .piece-card__copy { padding: 14px 0 0; border-top: 1px solid transparent; }
 .piece-card__meta { display: flex; gap: 10px; min-height: 20px; color: var(--red); font-size: .57rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
 .piece-card__title { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-top: 3px; font-family: var(--font-serif); font-size: 1.55rem; }
@@ -290,7 +303,37 @@ img { display: block; }
 .objects-empty { padding: 100px 0; text-align: center; color: var(--ink-soft); }
 
 /* Purchase states */
+.piece-hero__title { bottom: 92px; }
+.piece-hero__commerce {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2;
+  display: inline-flex;
+  min-height: 50px;
+  align-items: center;
+  gap: 28px;
+  padding: 12px 18px;
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  color: var(--ink);
+  font-size: .62rem;
+  font-weight: 750;
+  letter-spacing: .12em;
+}
+.piece-hero__commerce--available { background: var(--red); color: var(--paper); }
+.piece-hero__commerce span { font-size: 1rem; }
+.piece-hero__image-note {
+  position: absolute;
+  top: 104px;
+  right: 20px;
+  padding: 8px 10px;
+  background: color-mix(in srgb, var(--paper) 90%, transparent);
+  color: var(--ink);
+  font-size: .52rem;
+  letter-spacing: .1em;
+}
 .purchase-panel {
+  scroll-margin-top: 110px;
   margin: 64px 0 88px;
   padding: clamp(42px, 7vw, 88px);
   border-top: 2px solid var(--red);
@@ -336,6 +379,21 @@ img { display: block; }
   transition: background-color .2s ease;
 }
 .purchase-panel__button:hover { background: #a4290c; }
+.purchase-panel__button--disabled {
+  cursor: not-allowed;
+  opacity: .48;
+}
+.purchase-panel__button--disabled:hover { background: var(--red); }
+.purchase-panel__story {
+  display: block;
+  width: fit-content;
+  margin: 20px auto 0;
+  border-bottom: 1px solid currentColor;
+  font-size: .64rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
 .purchase-panel__fineprint { margin: 15px auto 0 !important; font-size: .66rem; }
 
 /* Letter and legal */
@@ -411,6 +469,9 @@ img { display: block; }
   .home-hero__copy { left: 16px; right: 16px; bottom: 12vh; }
   .home-hero__copy h1 { font-size: clamp(3.6rem, 18vw, 5.3rem); }
   .home-hero__threshold { right: 16px; }
+  .piece-hero__commerce { right: 16px; bottom: 16px; left: 16px; justify-content: space-between; }
+  .piece-hero__title { bottom: 92px; left: 16px; right: 16px; }
+  .piece-hero__image-note { top: 88px; right: 16px; }
   .manifesto { grid-template-columns: 1fr; padding-block: 80px; }
   .manifesto__mark .noren-mark { width: 44px; height: 52px; }
   .manifesto__body { margin-left: 0; }
