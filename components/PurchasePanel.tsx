@@ -69,7 +69,11 @@ export default function PurchasePanel({
         <h2 id="purchase-heading">This edition has found its homes.</h2>
         <p>Join the letter to hear when a new edition or related object becomes available.</p>
         <div className="purchase-panel__form">
-          <NewsletterSignup source={`restock-${slug}`} buttonLabel="Notify me about the next edition" />
+          <NewsletterSignup
+            source={`restock-${slug}`}
+            intent="availability"
+            buttonLabel="Notify me about the next edition"
+          />
         </div>
       </section>
     )
@@ -82,7 +86,11 @@ export default function PurchasePanel({
         <h2 id="purchase-heading">We are sourcing the real object, not just the look.</h2>
         <p>We will open sales only after the maker, provenance, photography, delivery, and care conditions are confirmed.</p>
         <div className="purchase-panel__form">
-          <NewsletterSignup source={`waitlist-${slug}`} buttonLabel="Notify me when it is ready" />
+          <NewsletterSignup
+            source={`waitlist-${slug}`}
+            intent="availability"
+            buttonLabel="Notify me when it is ready"
+          />
         </div>
       </section>
     )

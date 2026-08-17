@@ -15,7 +15,27 @@ export const newsletterSubscriberType = defineType({
       readOnly: true,
     }),
     defineField({ name: 'consentedAt', title: 'Consented At', type: 'datetime', readOnly: true }),
+    defineField({ name: 'lastConsentedAt', title: 'Last Consented At', type: 'datetime', readOnly: true }),
     defineField({ name: 'createdAt', title: 'Created At', type: 'datetime', readOnly: true }),
+    defineField({
+      name: 'subscriptions',
+      title: 'Signup History',
+      type: 'array',
+      readOnly: true,
+      of: [{
+        type: 'object',
+        fields: [
+          defineField({ name: 'source', title: 'Source', type: 'string' }),
+          defineField({
+            name: 'intent',
+            title: 'Intent',
+            type: 'string',
+            options: { list: ['newsletter', 'availability'] },
+          }),
+          defineField({ name: 'consentedAt', title: 'Consented At', type: 'datetime' }),
+        ],
+      }],
+    }),
   ],
   preview: {
     select: { title: 'email', subtitle: 'source' },

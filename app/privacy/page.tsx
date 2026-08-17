@@ -34,7 +34,7 @@ export default function PrivacyPage() {
           </section>
           <section>
             <h2>Contact</h2>
-            <p>For a privacy or data request, contact Monogatari through the account linked from this website. A dedicated privacy email will be added before the newsletter’s public launch.</p>
+            <p>For a privacy or data request, email <a href="mailto:info@monostories.com">info@monostories.com</a>.</p>
           </section>
         </div>
       </main>

@@ -8,9 +8,15 @@ type Props = {
   source: string
   compact?: boolean
   buttonLabel?: string
+  intent?: 'newsletter' | 'availability'
 }
 
-export default function NewsletterSignup({ source, compact = false, buttonLabel = 'Receive the next story' }: Props) {
+export default function NewsletterSignup({
+  source,
+  compact = false,
+  buttonLabel = 'Receive the next story',
+  intent = 'newsletter',
+}: Props) {
   const id = useId()
   const enabled = process.env.NEXT_PUBLIC_NEWSLETTER_ENABLED === 'true'
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -42,15 +48,16 @@ export default function NewsletterSignup({ source, compact = false, buttonLabel 
         body: JSON.stringify({
           email: form.get('email'),
           source,
+          intent,
           company: form.get('company'),
         }),
       })
-      const result = await response.json()
+      const result = await response.json().catch(() => ({ message: '' }))
       if (!response.ok) throw new Error(result.message || 'Please try again.')
       formElement.reset()
       setStatus('success')
       setMessage(result.message)
-      track('newsletter_signup', { source })
+      track('newsletter_signup', { source, intent })
     } catch (error) {
       setStatus('error')
       setMessage(error instanceof Error ? error.message : 'Please try again.')
@@ -87,7 +94,10 @@ export default function NewsletterSignup({ source, compact = false, buttonLabel 
       </button>
       {status === 'error' && <p className="newsletter-error" role="alert">{message}</p>}
       <p className="newsletter-consent">
-        One quiet letter a week. Unsubscribe anytime. By subscribing, you agree to our <NorenLink href="/privacy">privacy notice</NorenLink>.
+        {intent === 'availability'
+          ? 'Availability updates for this object, plus one quiet letter a week. '
+          : 'One quiet letter a week. '}
+        Unsubscribe anytime. By subscribing, you agree to our <NorenLink href="/privacy">privacy notice</NorenLink>.
       </p>
     </form>
   )

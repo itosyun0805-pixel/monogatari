@@ -22,12 +22,18 @@ async function subscribeWithButtondown(
   email: string,
   apiKey: string,
   request: Request,
+  source: string,
+  intent: 'newsletter' | 'availability',
 ) {
   const forwardedFor = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
   const body = JSON.stringify({
     email_address: email,
     ...(forwardedFor ? { ip_address: forwardedFor } : {}),
     ...(request.headers.get('referer') ? { referrer_url: request.headers.get('referer') } : {}),
+    notes: `${intent === 'availability' ? 'Availability' : 'Newsletter'} signup: ${source}`,
+    utm_source: 'monostories.com',
+    utm_medium: 'website',
+    utm_campaign: intent === 'availability' ? source : 'monogatari-letter',
   })
 
   const createContact = (overwrite = false) => fetch('https://api.buttondown.com/v1/subscribers', {
@@ -46,6 +52,44 @@ async function subscribeWithButtondown(
   }
 
   throw new Error('Buttondown rejected the subscriber.')
+}
+
+async function recordConsent(
+  email: string,
+  source: string,
+  intent: 'newsletter' | 'availability',
+  consentedAt: string,
+  token: string,
+) {
+  const sanity = createClient({
+    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'vm9j2v4c',
+    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+    apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01',
+    token,
+    useCdn: false,
+  })
+  const id = `newsletterSubscriber.${createHash('sha256').update(email).digest('hex')}`
+  const eventKey = createHash('sha256')
+    .update(`${email}:${source}:${consentedAt}`)
+    .digest('hex')
+    .slice(0, 16)
+
+  await sanity.createIfNotExists({
+    _id: id,
+    _type: 'newsletterSubscriber',
+    email,
+    source,
+    status: 'subscribed',
+    consentedAt,
+    createdAt: consentedAt,
+    subscriptions: [],
+  })
+  await sanity
+    .patch(id)
+    .set({ source, status: 'subscribed', consentedAt, lastConsentedAt: consentedAt })
+    .setIfMissing({ subscriptions: [] })
+    .append('subscriptions', [{ _key: eventKey, source, intent, consentedAt }])
+    .commit()
 }
 
 async function subscribeWithResend(email: string, apiKey: string, segmentId?: string) {
@@ -88,7 +132,7 @@ async function subscribeWithResend(email: string, apiKey: string, segmentId?: st
 }
 
 export async function POST(request: Request) {
-  let payload: { email?: unknown; source?: unknown; company?: unknown }
+  let payload: { email?: unknown; source?: unknown; intent?: unknown; company?: unknown }
   try {
     payload = await request.json()
   } catch {
@@ -100,7 +144,10 @@ export async function POST(request: Request) {
   }
 
   const email = typeof payload.email === 'string' ? payload.email.trim().toLowerCase() : ''
-  const source = typeof payload.source === 'string' ? payload.source.slice(0, 120) : 'website'
+  const source = typeof payload.source === 'string'
+    ? payload.source.trim().replace(/[^a-zA-Z0-9:_-]/g, '-').slice(0, 120) || 'website'
+    : 'website'
+  const intent = payload.intent === 'availability' ? 'availability' : 'newsletter'
 
   if (!emailPattern.test(email) || email.length > 254) {
     return Response.json({ message: 'Please enter a valid email address.' }, { status: 400 })
@@ -113,49 +160,48 @@ export async function POST(request: Request) {
   const buttondownApiKey = process.env.BUTTONDOWN_API_KEY?.trim()
   const consentedAt = new Date().toISOString()
   let requiresConfirmation = false
+  let providerSucceeded = false
 
   try {
     if (buttondownApiKey) {
-      await subscribeWithButtondown(email, buttondownApiKey, request)
+      await subscribeWithButtondown(email, buttondownApiKey, request, source, intent)
       requiresConfirmation = true
+      providerSucceeded = true
     } else if (resendApiKey) {
       await subscribeWithResend(email, resendApiKey, resendSegmentId)
-    } else if (token) {
-      const sanity = createClient({
-        projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'vm9j2v4c',
-        dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
-        apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01',
-        token,
-        useCdn: false,
-      })
-      const id = `newsletterSubscriber.${createHash('sha256').update(email).digest('hex')}`
-      await sanity.createIfNotExists({
-        _id: id,
-        _type: 'newsletterSubscriber',
-        email,
-        source,
-        status: 'subscribed',
-        consentedAt,
-        createdAt: consentedAt,
-      })
+      providerSucceeded = true
     } else if (webhook) {
       const response = await fetch(webhook, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source, consentedAt }),
+        body: JSON.stringify({ email, source, intent, consentedAt }),
       })
       if (!response.ok) throw new Error('Newsletter provider rejected the request.')
-    } else {
+      providerSucceeded = true
+    } else if (!token) {
       return Response.json(
         { message: 'Newsletter registration is being connected. Please try again shortly.' },
         { status: 503 },
       )
     }
 
+    if (token) {
+      try {
+        await recordConsent(email, source, intent, consentedAt, token)
+      } catch (error) {
+        if (!providerSucceeded) throw error
+        console.error('Newsletter consent logging failed after provider signup.', error)
+      }
+    }
+
     return Response.json({
-      message: requiresConfirmation
-        ? 'Almost there. Check your inbox and confirm your subscription.'
-        : 'You’re in. The next story will arrive in your inbox.',
+      message: intent === 'availability'
+        ? requiresConfirmation
+          ? 'Almost there. Confirm your email to receive availability updates.'
+          : 'You’re on the list. We’ll email you when this object is ready.'
+        : requiresConfirmation
+          ? 'Almost there. Check your inbox and confirm your subscription.'
+          : 'You’re in. The next story will arrive in your inbox.',
     })
   } catch {
     return Response.json(
