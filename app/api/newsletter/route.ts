@@ -11,11 +11,11 @@ const resendHeaders = (apiKey: string) => ({
   'User-Agent': 'monogatari-newsletter/1.0',
 })
 
-const buttondownHeaders = (apiKey: string, overwrite = false) => ({
+const buttondownHeaders = (apiKey: string, collision?: 'add' | 'overwrite') => ({
   Authorization: `Token ${apiKey}`,
   'Content-Type': 'application/json',
   'User-Agent': 'monogatari-newsletter/1.0',
-  ...(overwrite ? { 'X-Buttondown-Collision-Behavior': 'overwrite' } : {}),
+  ...(collision ? { 'X-Buttondown-Collision-Behavior': collision } : {}),
 })
 
 async function subscribeWithButtondown(
@@ -24,34 +24,65 @@ async function subscribeWithButtondown(
   request: Request,
   source: string,
   intent: 'newsletter' | 'availability',
+  consentedAt: string,
 ) {
   const forwardedFor = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-  const body = JSON.stringify({
+  const signupNote = `${consentedAt} | ${intent === 'availability' ? 'Availability' : 'Newsletter'} signup: ${source}`
+  const subscriber = {
     email_address: email,
     ...(forwardedFor ? { ip_address: forwardedFor } : {}),
     ...(request.headers.get('referer') ? { referrer_url: request.headers.get('referer') } : {}),
-    notes: `${intent === 'availability' ? 'Availability' : 'Newsletter'} signup: ${source}`,
+    notes: signupNote,
     utm_source: 'monostories.com',
     utm_medium: 'website',
     utm_campaign: intent === 'availability' ? source : 'monogatari-letter',
-  })
-
-  const createContact = (overwrite = false) => fetch('https://api.buttondown.com/v1/subscribers', {
-    method: 'POST',
-    headers: buttondownHeaders(apiKey, overwrite),
-    body,
-  })
-
-  const createResponse = await createContact()
-  if (createResponse.ok) return
-
-  // A returning reader has explicitly opted in again through this form.
-  if (createResponse.status === 400 || createResponse.status === 409) {
-    const overwriteResponse = await createContact(true)
-    if (overwriteResponse.ok) return
   }
 
-  throw new Error('Buttondown rejected the subscriber.')
+  const createResponse = await fetch('https://api.buttondown.com/v1/subscribers', {
+    method: 'POST',
+    headers: buttondownHeaders(apiKey),
+    body: JSON.stringify(subscriber),
+  })
+  if (createResponse.ok) return true
+
+  const createError = await createResponse.json().catch(() => null) as { code?: unknown } | null
+  if (
+    (createResponse.status !== 400 && createResponse.status !== 409)
+    || createError?.code !== 'email_already_exists'
+  ) {
+    throw new Error('Buttondown rejected the subscriber.')
+  }
+
+  const subscriberPath = encodeURIComponent(email)
+  const existingResponse = await fetch(`https://api.buttondown.com/v1/subscribers/${subscriberPath}`, {
+    headers: buttondownHeaders(apiKey),
+  })
+  if (!existingResponse.ok) throw new Error('Buttondown could not retrieve the subscriber.')
+
+  const existing = await existingResponse.json() as { notes?: unknown; type?: unknown }
+  const existingNotes = typeof existing.notes === 'string' ? existing.notes.trim() : ''
+  const notes = existingNotes ? `${existingNotes}\n${signupNote}` : signupNote
+  const existingType = typeof existing.type === 'string' ? existing.type : ''
+
+  // Sticky states need a fresh double opt-in. Active and pending readers only
+  // need the new consent event appended to their private notes.
+  if (existingType === 'unsubscribed' || existingType === 'removed') {
+    const resubscribeResponse = await fetch('https://api.buttondown.com/v1/subscribers', {
+      method: 'POST',
+      headers: buttondownHeaders(apiKey, 'add'),
+      body: JSON.stringify({ ...subscriber, notes, type: 'unactivated' }),
+    })
+    if (!resubscribeResponse.ok) throw new Error('Buttondown could not resubscribe the reader.')
+    return true
+  }
+
+  const updateResponse = await fetch(`https://api.buttondown.com/v1/subscribers/${subscriberPath}`, {
+    method: 'PATCH',
+    headers: buttondownHeaders(apiKey),
+    body: JSON.stringify({ notes }),
+  })
+  if (!updateResponse.ok) throw new Error('Buttondown could not update the subscriber.')
+  return existingType === 'unactivated'
 }
 
 async function recordConsent(
@@ -164,8 +195,14 @@ export async function POST(request: Request) {
 
   try {
     if (buttondownApiKey) {
-      await subscribeWithButtondown(email, buttondownApiKey, request, source, intent)
-      requiresConfirmation = true
+      requiresConfirmation = await subscribeWithButtondown(
+        email,
+        buttondownApiKey,
+        request,
+        source,
+        intent,
+        consentedAt,
+      )
       providerSucceeded = true
     } else if (resendApiKey) {
       await subscribeWithResend(email, resendApiKey, resendSegmentId)

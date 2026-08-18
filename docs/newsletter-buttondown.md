@@ -11,10 +11,11 @@ Buttondown is the default provider for the Monogatari MVP because the first 100 
 5. Redeploy the site and submit a real address through `/newsletter`.
 6. Open the confirmation email and confirm the subscription. Buttondown requires double opt-in by default.
 
-The website records every consent event in Sanity as well as Buttondown. The
-`source` and `intent` fields distinguish the weekly Letter from a product's
-waitlist or restock request. Buttondown also receives the source in the
-subscriber notes and UTM campaign so the signup is still identifiable there.
+The website appends every consent event to the subscriber's private Buttondown
+notes. The `source` and `intent` distinguish the weekly Letter from a product's
+waitlist or restock request. The source is also copied to the UTM campaign, and
+Sanity receives the same structured history when a write-enabled token is
+available.
 
 ## Sending an issue
 
