@@ -4,7 +4,7 @@ import { NorenLink } from './NorenTransition'
 import type { PieceSummary } from '@/types/content'
 import { getEditorialStoryForPiece } from '@/content/editorial'
 
-export default function PieceCard({ title, titleJa, slug, heroImage, lifestyleTags, category, saleStatus, isAvailable }: PieceSummary) {
+export default function PieceCard({ title, titleJa, slug, heroImage, imageUrl, lifestyleTags, category, saleStatus, isAvailable }: PieceSummary) {
   const editorialImage = getEditorialStoryForPiece(slug.current)
   const statusLabel = isAvailable
     ? 'AVAILABLE · 販売中'
@@ -17,9 +17,9 @@ export default function PieceCard({ title, titleJa, slug, heroImage, lifestyleTa
   return (
     <NorenLink href={`/pieces/${slug.current}`} className="piece-card">
       <div className="piece-card__image">
-        {(editorialImage || heroImage) && (
+        {(imageUrl || editorialImage || heroImage) && (
           <Image
-            src={editorialImage?.heroImage || urlFor(heroImage!).width(600).height(750).url()}
+            src={imageUrl || editorialImage?.heroImage || urlFor(heroImage!).width(600).height(750).url()}
             alt={editorialImage?.heroAlt || title}
             width={600}
             height={750}

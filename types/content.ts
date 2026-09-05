@@ -10,10 +10,13 @@ export type PieceSummary = {
   region?: string
   placeName?: string
   heroImage?: object | null
+  imageUrl?: string
   crossover?: string
   publishedAt?: string
   saleStatus?: 'editorial' | 'waitlist' | 'available' | 'soldOut'
   isAvailable?: boolean
+  price?: number
+  currency?: 'USD' | 'JPY' | 'GBP' | 'EUR'
 }
 
 export type PieceDetail = PieceSummary & {

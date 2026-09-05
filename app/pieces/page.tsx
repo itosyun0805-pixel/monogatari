@@ -7,6 +7,7 @@ import { client } from '@/sanity/lib/client'
 import { allPiecesQuery } from '@/sanity/lib/queries'
 import { siteUrl } from '@/lib/site'
 import type { PieceSummary } from '@/types/content'
+import { withTsurushiBina } from '@/content/tsurushi-bina-summary'
 
 export const revalidate = 60
 
@@ -17,7 +18,8 @@ export const metadata: Metadata = {
 }
 
 export default async function PiecesPage() {
-  const pieces = await client.fetch<PieceSummary[]>(allPiecesQuery)
+  const editorialPieces = await client.fetch<PieceSummary[]>(allPiecesQuery)
+  const pieces = withTsurushiBina(editorialPieces)
 
   return (
     <>
