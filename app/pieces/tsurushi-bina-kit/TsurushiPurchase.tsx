@@ -26,6 +26,7 @@ export default function TsurushiPurchase() {
           <div className={styles.orderContents}>
             <p><span>Included</span>Kimono cloth · needle + thread · filling · cord · English guide</p>
             <p><span>You bring</span>Scissors</p>
+            <p><span>Cloth</span>Selected at random from one retired kimono · patterns cannot be chosen</p>
           </div>
 
           <a className={styles.cartButton} href={SHOPIFY_CHECKOUT_URL}>

@@ -114,6 +114,12 @@
 .makesThree { width: min(360px, 100%); padding: 20px 0; display: flex; align-items: baseline; justify-content: space-between; gap: 24px; border-block: 1px solid var(--ink); }
 .makesThree span, .inventoryLabel, .youBring span { color: var(--muted); font-size: .62rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
 .makesThree strong { font-family: var(--serif); font-size: 1.7rem; font-weight: 400; }
+.clothStory { margin-top: 54px; padding-top: 28px; border-top: 1px solid var(--line); }
+.clothStory p { max-width: 500px; margin-bottom: 16px; color: var(--muted); font-size: .82rem; line-height: 1.7; }
+.clothStory p:first-child { margin-bottom: 19px; color: var(--ink); font-family: var(--serif); font-size: 1.22rem; line-height: 1.35; }
+.kitPhoto { margin: 0 0 48px; }
+.kitPhoto img { width: 100%; height: auto; display: block; background: var(--paper-soft); }
+.kitPhoto figcaption { padding: 13px 0 0; color: var(--muted); font-size: .61rem; line-height: 1.5; letter-spacing: .025em; }
 .inventoryLabel { margin-bottom: 22px; }
 .inventory ol { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--ink); }
 .inventory li { min-height: 116px; padding: 24px 0; display: grid; grid-template-columns: 54px minmax(150px, .8fr) 1fr; gap: 24px; align-items: center; border-bottom: 1px solid var(--line); }

@@ -119,9 +119,24 @@ export default function TsurushiBinaKitPage() {
               <span>Makes</span>
               <strong>3 ornaments</strong>
             </div>
+            <div className={styles.clothStory}>
+              <p>Why the cloth is chosen at random</p>
+              <p>Tsurushi-bina began with the kimono scraps a family already had. We keep that same logic.</p>
+              <p>We wash and press one retired kimono, then cut only what it gives us. Your cloth is selected from that garment, so its colours and patterns will be a surprise. Patterns cannot be chosen.</p>
+            </div>
           </div>
 
           <div className={styles.inventory}>
+            <figure className={styles.kitPhoto}>
+              <Image
+                src="/tsurushi-bina/kit-contents-draft.png"
+                alt="Example arrangement of kimono cloth, a needle, thread, soft filling, hanging cords, and an English instruction guide included in the Tsurushi-bina kit"
+                width={1448}
+                height={1086}
+                sizes="(max-width: 700px) 100vw, 56vw"
+              />
+              <figcaption>Example contents. The kimono cloth in your kit is chosen at random and will differ from this photograph.</figcaption>
+            </figure>
             <p className={styles.inventoryLabel}>Included in the kit</p>
             <ol>
               <li>
