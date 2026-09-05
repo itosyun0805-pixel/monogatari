@@ -23,6 +23,11 @@ export default function TsurushiPurchase() {
             <b>€50</b>
           </div>
 
+          <div className={styles.orderContents}>
+            <p><span>Included</span>Kimono cloth · needle + thread · filling · cord · English guide</p>
+            <p><span>You bring</span>Scissors</p>
+          </div>
+
           <a className={styles.cartButton} href={SHOPIFY_CHECKOUT_URL}>
             Continue to secure checkout · €50
           </a>
@@ -36,7 +41,7 @@ export default function TsurushiPurchase() {
       <aside className={styles.stickyPurchase} aria-label="Buy the Tsurushi-bina Kit">
         <span className={styles.stickyProduct}>
           <strong>Tsurushi-bina Kit</strong>
-          <small>Three ornaments · Ships within 30 days</small>
+          <small>Makes 3 · Materials + guide included</small>
         </span>
         <span className={styles.stickyPrice}>€50</span>
         <a href={SHOPIFY_CHECKOUT_URL}>Buy the kit</a>

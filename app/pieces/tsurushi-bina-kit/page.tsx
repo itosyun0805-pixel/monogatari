@@ -56,6 +56,7 @@ export default function TsurushiBinaKitPage() {
         </Link>
         <nav aria-label="Product navigation">
           <a href="#story">Story</a>
+          <a href="#inside">Inside</a>
           <a href="#making">Making</a>
           <a href="#kit">The kit</a>
         </nav>
@@ -106,6 +107,53 @@ export default function TsurushiBinaKitPage() {
               <div><dt>When</dt><dd>the first weekend you put the tree up</dd></div>
             </dl>
             <p className={styles.reassurance}>No machine. No sewing experience. The needle and thread are already in the kit.</p>
+          </div>
+        </section>
+
+        <section className={styles.kitContents} id="inside" aria-labelledby="kit-contents-title">
+          <div className={styles.kitContentsIntro}>
+            <p className={styles.sectionLabel}>Inside the parcel · 箱の中身</p>
+            <h2 id="kit-contents-title">Everything for your first three.</h2>
+            <p>Open the parcel and begin. The only thing not in the kit is a pair of scissors.</p>
+            <div className={styles.makesThree}>
+              <span>Makes</span>
+              <strong>3 ornaments</strong>
+            </div>
+          </div>
+
+          <div className={styles.inventory}>
+            <p className={styles.inventoryLabel}>Included in the kit</p>
+            <ol>
+              <li>
+                <span>01</span>
+                <strong>Kimono cloth</strong>
+                <small>Fabric for three ornaments</small>
+              </li>
+              <li>
+                <span>02</span>
+                <strong>Needle + thread</strong>
+                <small>Ready for hand sewing</small>
+              </li>
+              <li>
+                <span>03</span>
+                <strong>Soft filling</strong>
+                <small>For shaping each small form</small>
+              </li>
+              <li>
+                <span>04</span>
+                <strong>Hanging cord</strong>
+                <small>For the finished ornaments</small>
+              </li>
+              <li>
+                <span>05</span>
+                <strong>English guide</strong>
+                <small>Follow it at your own pace</small>
+              </li>
+            </ol>
+            <div className={styles.youBring}>
+              <span>You bring</span>
+              <strong>One pair of scissors</strong>
+            </div>
           </div>
         </section>
 
