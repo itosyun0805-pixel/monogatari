@@ -1,51 +1,81 @@
+import Link from 'next/link'
 import Image from 'next/image'
 import { urlFor } from '@/sanity/lib/image'
-import { NorenLink } from './NorenTransition'
-import type { PieceSummary } from '@/types/content'
-import { getEditorialStoryForPiece } from '@/content/editorial'
+import {
+  type Availability,
+  formatPrice,
+  getAvailabilityText,
+  resolveAvailability,
+} from '@/lib/commerce'
 
-export default function PieceCard({ title, titleJa, slug, heroImage, imageUrl, lifestyleTags, category, saleStatus, isAvailable }: PieceSummary) {
-  const editorialImage = getEditorialStoryForPiece(slug.current)
-  const statusLabel = isAvailable
-    ? 'AVAILABLE · 販売中'
-    : saleStatus === 'soldOut'
-      ? 'SOLD OUT · 完売'
-      : saleStatus === 'waitlist'
-        ? 'WAITLIST · 入荷準備中'
-        : 'COMING SOON · 販売準備中'
+type Props = {
+  title: string
+  titleJa: string
+  slug: { current: string }
+  heroImage?: object | null
+  lifestyleTags?: string[]
+  category?: string
+  price?: number
+  currency?: string
+  availability?: Availability
+  availabilityNote?: string
+  waitlistCount?: number
+  getLink?: string
+}
+
+export default function PieceCard({
+  title,
+  titleJa,
+  slug,
+  heroImage,
+  lifestyleTags,
+  category,
+  price,
+  currency,
+  availability: availabilityValue,
+  availabilityNote,
+  waitlistCount,
+  getLink,
+}: Props) {
+  const availability = resolveAvailability(availabilityValue, getLink)
 
   return (
-    <NorenLink href={`/pieces/${slug.current}`} className="piece-card">
-      <div className="piece-card__image">
-        {(imageUrl || editorialImage || heroImage) && (
+    <Link href={`/pieces/${slug.current}`} className="group block">
+      <div className="overflow-hidden" style={{ aspectRatio: '4/5', backgroundColor: 'var(--color-surface-high)' }}>
+        {heroImage && (
           <Image
-            src={imageUrl || editorialImage?.heroImage || urlFor(heroImage!).width(600).height(750).url()}
-            alt={editorialImage?.heroAlt || title}
+            src={urlFor(heroImage).width(600).height(750).url()}
+            alt={title}
             width={600}
             height={750}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
         )}
-        <span className={`piece-card__status ${isAvailable ? 'piece-card__status--available' : ''}`}>
-          {statusLabel}
-        </span>
       </div>
-      <div className="piece-card__copy">
-        <div className="piece-card__meta">
+      <div className="mt-4">
+        <div className="flex flex-wrap gap-2 mb-2">
           {lifestyleTags?.slice(0, 2).map(tag => (
-            <span key={tag}>
+            <span key={tag} className="label-caps" style={{ color: 'var(--color-primary-container)', fontSize: '10px' }}>
               {tag}
             </span>
           ))}
           {category && (
-            <span>{category}</span>
+            <span className="label-caps" style={{ color: 'var(--color-outline)', fontSize: '10px' }}>{category}</span>
           )}
         </div>
-        <div className="piece-card__title">
-          <span>{title}</span>
-          <small lang="ja">{titleJa}</small>
+        <div className="flex items-baseline justify-between">
+          <span className="font-serif text-xl" style={{ color: 'var(--color-on-surface)' }}>{title}</span>
+          <span className="text-sm ml-3" style={{ color: 'var(--color-on-surface-variant)' }}>{titleJa}</span>
+        </div>
+        <div className="mt-4 border-t pt-4" style={{ borderColor: 'var(--color-outline-variant)' }}>
+          <p className="font-sans text-sm" style={{ color: 'var(--color-on-surface)' }}>
+            {formatPrice(price, currency)}
+          </p>
+          <p className="mt-1 text-xs" style={{ color: 'var(--color-on-surface-variant)' }}>
+            {getAvailabilityText({ availability, availabilityNote, waitlistCount })}
+          </p>
         </div>
       </div>
-    </NorenLink>
+    </Link>
   )
 }

@@ -3,29 +3,30 @@ import { groq } from 'next-sanity'
 export const allPiecesQuery = groq`
   *[_type == "piece" && !(_id in path("drafts.**"))] | order(publishedAt desc) {
     _id, title, titleJa, slug, category, lifestyleTags, region, placeName,
-    heroImage, crossover, saleStatus,
-    "isAvailable": saleStatus == "available" && salesReady == true && defined(checkoutUrl) && defined(price),
-    publishedAt
+    price, currency, availability, availabilityNote, waitlistCount, getLink,
+    heroImage, crossover, publishedAt
   }
 `
 
 export const pieceBySlugQuery = groq`
   *[_type == "piece" && !(_id in path("drafts.**")) && slug.current == $slug][0] {
     _id, title, titleJa, slug, category, lifestyleTags, region, placeName,
+    price, currency, availability, availabilityNote, waitlistCount,
     heroImage, origin, craft,
-    maker { name, photo, location, quote }, makerVerified,
+    maker { name, photo, location, quote },
     crossover,
     newUse[] { image, caption },
     howItLives,
     keepers[] { name, quote },
-    saleStatus, price, currency, checkoutUrl, availabilityNote, shippingNote, salesReady,
     getLink, publishedAt
   }
 `
 
 export const piecesByRegionQuery = groq`
   *[_type == "piece" && !(_id in path("drafts.**")) && region == $region] | order(publishedAt desc) {
-    _id, title, titleJa, slug, category, lifestyleTags, region, heroImage
+    _id, title, titleJa, slug, category, lifestyleTags, region, placeName,
+    price, currency, availability, availabilityNote, waitlistCount, getLink,
+    heroImage
   }
 `
 
@@ -39,13 +40,18 @@ export const storyBySlugQuery = groq`
   *[_type == "story" && !(_id in path("drafts.**")) && slug.current == $slug][0] {
     _id, title, titleJa, slug, publishedAt, location, region,
     heroImage, excerpt, body, tags,
-    relatedPieces[]-> { _id, title, titleJa, slug, heroImage }
+    relatedPieces[]-> {
+      _id, title, titleJa, slug, category, lifestyleTags, region, placeName,
+      price, currency, availability, availabilityNote, waitlistCount, getLink,
+      heroImage
+    }
   }
 `
 
 export const featuredPiecesQuery = groq`
   *[_type == "piece" && !(_id in path("drafts.**"))] | order(publishedAt desc) [0...4] {
-    _id, title, titleJa, slug, category, lifestyleTags, heroImage, saleStatus,
-    "isAvailable": saleStatus == "available" && salesReady == true && defined(checkoutUrl) && defined(price)
+    _id, title, titleJa, slug, category, lifestyleTags, region, placeName,
+    price, currency, availability, availabilityNote, waitlistCount, getLink,
+    heroImage
   }
 `
