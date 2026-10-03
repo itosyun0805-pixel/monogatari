@@ -9,7 +9,7 @@ export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pieces = await client.fetch<PieceSummary[]>(allPiecesQuery)
-  const staticPages = ['', '/pieces', '/magazine', '/map', '/about', '/newsletter', '/privacy']
+  const staticPages = ['', '/pieces', '/magazine', '/map', '/about', '/for-makers', '/newsletter', '/privacy']
 
   return [
     ...staticPages.map((path) => ({
