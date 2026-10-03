@@ -17,7 +17,7 @@ export default function Footer() {
           <span>mono.stories</span>
         </div>
         <nav aria-label="Footer navigation">
-          {[['Objects', '/pieces'], ['Magazine', '/magazine'], ['Places', '/map'], ['About', '/about'], ['For Makers', '/for-makers'], ['Privacy', '/privacy']].map(([label, href]) => (
+          {[['Objects', '/pieces'], ['Magazine', '/magazine'], ['Places', '/map'], ['About', '/about'], ['Privacy', '/privacy']].map(([label, href]) => (
             <NorenLink key={href} href={href}>{label}</NorenLink>
           ))}
         </nav>
